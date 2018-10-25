@@ -74,7 +74,7 @@ def parserXMLNCTFile(fileName, dataModelsList):
     root = tree.getroot()
 
     for dataModel in dataModelsList:
-        print("parsing datamodel:{}".format(dataModel["name"]))
+        # print("parsing datamodel:{}".format(dataModel["name"]))
         # parseXMLToDataModel(dataModel)
 
         #Create instance of the class

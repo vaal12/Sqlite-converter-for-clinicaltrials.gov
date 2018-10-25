@@ -7,6 +7,8 @@ class Study(Base):
 
     id = Column(Integer, primary_key=True)
 
+    nct_id 	 = Column(String, 	doc = "id_info > nct_id")
+    
     allocation	 = Column(String, 	doc = "study_design_info > allocation")
     brief_summary 	 = Column(String, 	doc = "brief_summary > textblock")
     brief_title 	 = Column(String, 	doc = "brief_title")
@@ -17,7 +19,7 @@ class Study(Base):
     last_known_status	 = Column(String, 	doc = "last_known_status")
     last_update_submitted	 = Column(String, 	doc = "last_update_submitted")
     masking 	 = Column(String, 	doc = "study_design_info > masking")
-    nct_id 	 = Column(String, 	doc = "id_info > nct_id")
+    
     official_title	 = Column(String, 	doc = "official_title")
     org_study_id	 = Column(String, 	doc = "id_info > org_study_id")
     overall_status 	 = Column(String, 	doc = "overall_status")

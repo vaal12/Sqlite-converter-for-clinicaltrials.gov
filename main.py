@@ -18,7 +18,7 @@ import os
 from xml_parsing_routines import parserXMLNCTFile
 
 
-def parseXMLFilesInDir(fileDirPath, totalFileNumberInDir, tables_writers_list):
+def parseXMLFilesInDir(fileDirPath, totalFileNumberInDir, tables_writers_list, session):
         fileCounter = 0
         objects_created = []
         for dirName, subdirList, fileList in os.walk(fileDirPath):
@@ -38,9 +38,15 @@ def parseXMLFilesInDir(fileDirPath, totalFileNumberInDir, tables_writers_list):
                         # print("\t\t Total number of files:%i"%(totalFileNumberInDir))
                         objs_created = parserXMLNCTFile(dirName+"\\\\"+fname,
                                                 tables_writers_list)
-                        print("Objs created:{}".format(objs_created))
+                        # print("Objs created:{}".format(objs_created))
+                        print("Number of objs created:{}".format(len(objs_created)))
                         objects_created.extend(objs_created)
-        return objects_created
+                        if len(objects_created) > 800:
+                                for obj in objects_created:
+                                        session.add(obj)
+                                del objects_created[:]
+                        session.commit()
+        return None
 #END def parseXMLFilesInDir(fileDirPath, totalFileNumberInDir, tables_writers_list):    
 
 import datetime
@@ -75,10 +81,9 @@ if __name__ == "__main__":
 
         # session.add(new_study)
 
-        created_objects = parseXMLFilesInDir(XML_FILE_DIR, 1000, models_list)
+        created_objects = parseXMLFilesInDir(XML_FILE_DIR, 1000, models_list, session)
 
-        for obj in created_objects:
-                session.add(obj)
+       
 
         # 10 - commit and close session
         session.commit()
