@@ -68,12 +68,17 @@ def parserXMLNCTFile(fileName, dataModelsList):
     logging.debug("")
     logging.debug("")
 
+    dataObjectsCreated = []
+
     tree = ET.parse(fileName)
     root = tree.getroot()
 
     for dataModel in dataModelsList:
         print("parsing datamodel:{}".format(dataModel["name"]))
         # parseXMLToDataModel(dataModel)
+
+        #Create instance of the class
+        dataClass = dataModel["class"]()
 
         for key_tuple in (dataModel["fields"]):
             key = key_tuple[0]
@@ -104,16 +109,30 @@ def parserXMLNCTFile(fileName, dataModelsList):
 
             logging.debug( "childNodeBranchList at the end:"+str(childNodeBranchList))
 
+            
+            
             if len(keyBranchTextArray) > 0:#field found
                 keyBranchText = keyBranchTextArray[0]
                 logging.debug("keyBranchText:"+keyBranchText[:30])
+                setattr(dataClass, key, keyBranchText)
+                # print("Key:{}".format(key))
+                # print("text:{}".format(keyBranchText))
+
                 # StudyTableRec.append(keyBranchText.strip().encode("utf-8"))
                 # StudyTableRec.append(keyBranchText)
             else:#Field not found - putting NONE to datatable
                 logging.debug("keyBranchText IS NONE")
+                setattr(dataClass, key, "**None**")
                 # StudyTableRec.append("**None**")
+            # print("DataObject:{}".format(dataClass))
+            # print(dataClass.nct_id)
+            # print(dataClass.overall_status)
+           
         #END for key_tuple in dataModel["fields"]:
+        dataObjectsCreated.append(dataClass)
     #END for dataModel in dataModelsList:
+
+    return dataObjectsCreated
 
 
 

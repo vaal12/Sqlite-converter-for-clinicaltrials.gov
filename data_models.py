@@ -38,8 +38,8 @@ class LocationCountry(Base):
     __tablename__ = 'location_countries'
 
     id = Column(Integer, primary_key=True)
-    nct_id	 = Column(String, 	doc = "id_info > org_study_id")
-    country	 = Column(String, 	doc = "id_info > nct_id")
+    nct_id	 = Column(String, 	doc = "id_info > nct_id")
+    country	 = Column(String, 	doc = "location_countries > country")
 
     def __init__(self):
         pass

@@ -19,25 +19,28 @@ from xml_parsing_routines import parserXMLNCTFile
 
 
 def parseXMLFilesInDir(fileDirPath, totalFileNumberInDir, tables_writers_list):
-    fileCounter = 0
-
-    for dirName, subdirList, fileList in os.walk(fileDirPath):
-        print('Found directory: %s' % dirName)
-        for fname in fileList:
-        #     print(colorama.ansi.clear_screen())
-            fileCounter +=1
-            print("DIR:"+dirName)
-            print("  FILE:"+fname)
-            # print('\t\t\t\t\t%s' % fname)
-            logging.debug(dirName)
-            logging.debug('\t\t\t\t\t%s' % fname)
-            print("\n\nCurrent file number:%i of %i  (%2.1f %%)"%(fileCounter,
-                                    totalFileNumberInDir,
-                                    (fileCounter*100/totalFileNumberInDir)))
-            logging.debug("Current file number:%i"%(fileCounter))
-            # print("\t\t Total number of files:%i"%(totalFileNumberInDir))
-            parserXMLNCTFile(dirName+"\\\\"+fname,
-                                        tables_writers_list)
+        fileCounter = 0
+        objects_created = []
+        for dirName, subdirList, fileList in os.walk(fileDirPath):
+                print('Found directory: %s' % dirName)
+                for fname in fileList:
+                #     print(colorama.ansi.clear_screen())
+                        fileCounter +=1
+                        print("DIR:"+dirName)
+                        print("  FILE:"+fname)
+                        # print('\t\t\t\t\t%s' % fname)
+                        logging.debug(dirName)
+                        logging.debug('\t\t\t\t\t%s' % fname)
+                        print("\n\nCurrent file number:%i of %i  (%2.1f %%)"%(fileCounter,
+                                                totalFileNumberInDir,
+                                                (fileCounter*100/totalFileNumberInDir)))
+                        logging.debug("Current file number:%i"%(fileCounter))
+                        # print("\t\t Total number of files:%i"%(totalFileNumberInDir))
+                        objs_created = parserXMLNCTFile(dirName+"\\\\"+fname,
+                                                tables_writers_list)
+                        print("Objs created:{}".format(objs_created))
+                        objects_created.extend(objs_created)
+        return objects_created
 #END def parseXMLFilesInDir(fileDirPath, totalFileNumberInDir, tables_writers_list):    
 
 import datetime
@@ -57,15 +60,14 @@ if __name__ == "__main__":
 
         print(models_list)
 
-        parseXMLFilesInDir(XML_FILE_DIR, 1000, models_list)
+        
 
-        # # 2 - generate database schema
-        # Base.metadata.create_all(engine)
+        # 2 - generate database schema
+        Base.metadata.create_all(engine)
 
-        # # 3 - create a new session
-        # session = Session()
+        # 3 - create a new session
+        session = Session()
 
-        # # matt_damon = Actor("Matt Damon", date(1970, 10, 8))
 
         # new_study = Study()
 
@@ -73,8 +75,11 @@ if __name__ == "__main__":
 
         # session.add(new_study)
 
-        # # session.add(matt_damon)
+        created_objects = parseXMLFilesInDir(XML_FILE_DIR, 1000, models_list)
 
-        # # 10 - commit and close session
-        # session.commit()
-        # session.close()
+        for obj in created_objects:
+                session.add(obj)
+
+        # 10 - commit and close session
+        session.commit()
+        session.close()
