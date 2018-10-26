@@ -50,6 +50,65 @@ def parseXMLToDataModel(dataModel):
         print("Parsing field:{}".format(field))
 
 
+def createEntitiesFromFieldValuesDict(field_values_dict, data_model_class):
+    keys_list = field_values_dict.keys()
+    logging.debug("keys_list:{}".format(keys_list))
+    logging.debug("last key:{}".format(keys_list[-1]))
+    logging.debug("NUmber of keys:{}".format(len(keys_list)))
+    fields_dict = dict((field, 0) for field in field_values_dict.keys())
+    logging.debug("fields_dict:{}".format(fields_dict))
+    logging.debug("field_values_dict:{}".format(field_values_dict))
+
+    createdObjects = []
+    
+    # while fields_dict[keys_list[0]] < len(field_values_dict[keys_list[0]]):
+    logging.debug("fields_dict:{}".format(fields_dict))
+    curr_iterating_field = 0
+    while fields_dict[keys_list[curr_iterating_field]] < len(field_values_dict[keys_list[curr_iterating_field]]):
+        logging.debug("fields_dict:{}".format(fields_dict))
+        logging.debug("curr_iterating_field:{}".format(curr_iterating_field))
+
+        if curr_iterating_field < (len(keys_list)-1):
+            if fields_dict[keys_list[curr_iterating_field]] >= len(field_values_dict[keys_list[curr_iterating_field]]): 
+                #This field is exhausted - should move to level below
+                fields_dict[keys_list[curr_iterating_field]] = 0
+                curr_iterating_field -=1
+                if curr_iterating_field < 0:
+                    curr_iterating_field = 0
+                fields_dict[keys_list[curr_iterating_field]] +=1
+            else:
+                curr_iterating_field +=1
+            continue
+        else:
+            i=0 #Iterate on last key
+            logging.debug("creating objects")
+            while i < len(field_values_dict[keys_list[-1]]):#Iterate over last key values
+                k=0
+                objectList = []
+                while k<len(keys_list): #Iterate over current key fields
+                    # logging.debug("k={}".format(k))
+                    # logging.debug("iterating field:{}".format(keys_list[k]))
+                    # logging.debug("keys_list[k]:{}".format(keys_list[k]))
+                    # logging.debug("fields_dict[k]:{}".format(fields_dict[keys_list[k]]))
+                    # logging.debug("   Value:{}".format(field_values_dict[keys_list[k]][fields_dict[keys_list[k]]]))
+                    objectList.append(
+                        (keys_list[k], field_values_dict[keys_list[k]][fields_dict[keys_list[k]]])
+                    )
+                    k+=1
+                logging.debug("!!              OBJECT!!")
+                logging.debug(objectList)
+                i+=1
+            #Returning to level below
+            #!!!!!!!!!!!!!!! TO BE TESTED WITH DATAMODEL WITH JUSt ONE FIELD!!
+            curr_iterating_field -=1
+            if curr_iterating_field < 0:
+                    curr_iterating_field = 0
+            fields_dict[keys_list[curr_iterating_field]] +=1 
+
+
+                
+
+
 
 def parserXMLNCTFile(fileName, dataModelsList):
     logging.debug("")
@@ -74,23 +133,29 @@ def parserXMLNCTFile(fileName, dataModelsList):
     root = tree.getroot()
 
     for dataModel in dataModelsList:
-        # print("parsing datamodel:{}".format(dataModel["name"]))
-        # parseXMLToDataModel(dataModel)
+        logging.debug("parsing datamodel:{}".format(dataModel["name"]))
+
+        field_values_dict = {}
 
         #Create instance of the class
-        dataClass = dataModel["class"]()
+        # dataClass = dataModel["class"]()
 
         for key_tuple in (dataModel["fields"]):
             key = key_tuple[0]
             xml_path = key_tuple[1]
             logging.debug( "Parsing for key:"+key)
             logging.debug( "Key path:"+xml_path)
+
+            field_values_dict[key] = []
+
             childNodeBranchList = xml_path.replace(" ", "").split('>')
 
             # keyBranchText = parseXMLKeyBranch(root, childNodeBranchList)
             keyBranchTextArray = parseXMLKeyBranchWithList(root, childNodeBranchList)
 
-            if len(keyBranchTextArray)>1:#This is primary table - we do not need any duplicates - will put a warning to log file
+
+
+            if dataModel["name"] == "<class 'data_models.Study'>" and len(keyBranchTextArray)>1:#This is primary table - we do not need any duplicates - will put a warning to log file
                 logging.debug("")
                 logging.debug("")
                 logging.debug("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
@@ -114,22 +179,31 @@ def parserXMLNCTFile(fileName, dataModelsList):
             if len(keyBranchTextArray) > 0:#field found
                 keyBranchText = keyBranchTextArray[0]
                 logging.debug("keyBranchText:"+keyBranchText[:30])
-                setattr(dataClass, key, keyBranchText)
+
+                logging.debug("Number of branch texts found:{}".format(len(keyBranchTextArray)))
+
+                for keyValue in keyBranchTextArray:
+                    field_values_dict[key].append(keyValue)
+
+
+
+
+                # setattr(dataClass, key, keyBranchText)
                 # print("Key:{}".format(key))
                 # print("text:{}".format(keyBranchText))
 
-                # StudyTableRec.append(keyBranchText.strip().encode("utf-8"))
-                # StudyTableRec.append(keyBranchText)
-            else:#Field not found - putting NONE to datatable
+            else:   #Field not found - putting NONE to datatable
                 logging.debug("keyBranchText IS NONE")
-                setattr(dataClass, key, "**None**")
-                # StudyTableRec.append("**None**")
-            # print("DataObject:{}".format(dataClass))
-            # print(dataClass.nct_id)
-            # print(dataClass.overall_status)
+                field_values_dict[key].append("**None**")
+                # setattr(dataClass, key, "**None**")
            
+            logging.debug("key values dict:{}".format(field_values_dict))
+            
+            
+
         #END for key_tuple in dataModel["fields"]:
-        dataObjectsCreated.append(dataClass)
+        entitiesList = createEntitiesFromFieldValuesDict(field_values_dict, dataModel["class"])
+        # dataObjectsCreated.append(dataClass)
     #END for dataModel in dataModelsList:
 
     return dataObjectsCreated

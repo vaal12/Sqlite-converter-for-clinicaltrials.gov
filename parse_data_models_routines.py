@@ -1,10 +1,14 @@
 
+import logging
+
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 def parseDataModels(datamodelsList):
     DataModels = []
     for dataModel in datamodelsList:
         theModel = {"name": str(dataModel), "class": dataModel}
+        logging.debug("Creating data model. Name:{}".format(str(dataModel)))
+
 
         print("\n\n\n\n")
         print("have dataModel:{}".format(dataModel))
@@ -22,6 +26,7 @@ def parseDataModels(datamodelsList):
         # print(zip(studies_field_list, studies_field_doc_strs))
 
         theModel["fields"] = zip(nonID_field_list, studies_field_doc_strs)
+        logging.debug("Fields:{}".format(theModel["fields"]))
 
         DataModels.append(theModel)
 
