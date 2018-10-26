@@ -38,15 +38,20 @@ def parseXMLFilesInDir(fileDirPath, totalFileNumberInDir, tables_writers_list, s
                         # print("\t\t Total number of files:%i"%(totalFileNumberInDir))
                         objs_created = parserXMLNCTFile(dirName+"\\\\"+fname,
                                                 tables_writers_list)
-                        # print("Objs created:{}".format(objs_created))
+                        print("Objs created:{}".format(objs_created))
                         print("Number of objs created:{}".format(len(objs_created)))
                         objects_created.extend(objs_created)
                         if len(objects_created) > 800:
                                 for obj in objects_created:
                                         session.add(obj)
                                 del objects_created[:]
-                        session.commit()
-        return None
+                                session.commit()
+
+        for obj in objects_created: #In case some object were left hanging in list
+                session.add(obj)
+        del objects_created[:]
+        session.commit()
+        
 #END def parseXMLFilesInDir(fileDirPath, totalFileNumberInDir, tables_writers_list):    
 
 import datetime
@@ -81,7 +86,7 @@ if __name__ == "__main__":
 
         # session.add(new_study)
 
-        created_objects = parseXMLFilesInDir(XML_FILE_DIR, 1000, models_list, session)
+        parseXMLFilesInDir(XML_FILE_DIR, 1000, models_list, session)
 
        
 

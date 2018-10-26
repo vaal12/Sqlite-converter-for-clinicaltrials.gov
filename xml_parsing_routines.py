@@ -85,18 +85,24 @@ def createEntitiesFromFieldValuesDict(field_values_dict, data_model_class):
             while i < len(field_values_dict[keys_list[-1]]):#Iterate over last key values
                 k=0
                 objectList = []
+                newObj = data_model_class()
                 while k<len(keys_list): #Iterate over current key fields
                     # logging.debug("k={}".format(k))
                     # logging.debug("iterating field:{}".format(keys_list[k]))
                     # logging.debug("keys_list[k]:{}".format(keys_list[k]))
                     # logging.debug("fields_dict[k]:{}".format(fields_dict[keys_list[k]]))
                     # logging.debug("   Value:{}".format(field_values_dict[keys_list[k]][fields_dict[keys_list[k]]]))
+                    setattr(newObj , 
+                            keys_list[k], 
+                            field_values_dict[keys_list[k]][fields_dict[keys_list[k]]])
                     objectList.append(
                         (keys_list[k], field_values_dict[keys_list[k]][fields_dict[keys_list[k]]])
                     )
                     k+=1
                 logging.debug("!!              OBJECT!!")
                 logging.debug(objectList)
+                createdObjects.append(newObj)
+
                 i+=1
             #Returning to level below
             #!!!!!!!!!!!!!!! TO BE TESTED WITH DATAMODEL WITH JUSt ONE FIELD!!
@@ -104,6 +110,12 @@ def createEntitiesFromFieldValuesDict(field_values_dict, data_model_class):
             if curr_iterating_field < 0:
                     curr_iterating_field = 0
             fields_dict[keys_list[curr_iterating_field]] +=1 
+
+            logging.debug("CreatedObjects:{}".format(createdObjects))
+    return  createdObjects
+
+#END def createEntitiesFromFieldValuesDict(field_values_dict, data_model_class):
+
 
 
                 
@@ -203,6 +215,7 @@ def parserXMLNCTFile(fileName, dataModelsList):
 
         #END for key_tuple in dataModel["fields"]:
         entitiesList = createEntitiesFromFieldValuesDict(field_values_dict, dataModel["class"])
+        dataObjectsCreated.extend(entitiesList)
         # dataObjectsCreated.append(dataClass)
     #END for dataModel in dataModelsList:
 
