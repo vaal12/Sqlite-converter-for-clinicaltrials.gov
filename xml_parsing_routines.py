@@ -5,16 +5,14 @@ import xml.etree.ElementTree as ET
 
 #Works as CrossJoin on data: https://www.w3resource.com/sql/joins/cross-join.php
 def parseXMLKeyBranchWithList(parentNode, childNodeBranchList):
-    logging.debug("")
-    # logging.debug("")
     curr_tabStr = "\t"*(4-len(childNodeBranchList))
-    logging.debug(curr_tabStr+"parseXMLKeyBranchWithList parentNodeName:"+parentNode.tag)
-    logging.debug(curr_tabStr+"parseXMLKeyBranchWithList parsing list:"+str(childNodeBranchList))
+    # logging.debug(curr_tabStr+"parseXMLKeyBranchWithList parentNodeName:"+parentNode.tag)
+    # logging.debug(curr_tabStr+"parseXMLKeyBranchWithList parsing list:"+str(childNodeBranchList))
     # logging.debug("Iterating over child tag:"+childNodeBranchList[0])
     currNodeBranchTag = childNodeBranchList[0]
     del childNodeBranchList[0]
 
-    retList = []
+    # retList = []
 
     if not (parentNode.find(currNodeBranchTag) is None):
         foundTextsOfNodes = []
@@ -27,17 +25,16 @@ def parseXMLKeyBranchWithList(parentNode, childNodeBranchList):
             return foundTextsOfNodes
         else:
             # This is not the last child in branch - recursing downs
-            logging.debug(curr_tabStr+"This is Recursion.")
+            # logging.debug(curr_tabStr+"This is Recursion.")
             for foundNode in parentNode.findall(currNodeBranchTag):
 
                 foundTextsOfNodes.extend(parseXMLKeyBranchWithList(foundNode,
                                             list(childNodeBranchList)))
             return foundTextsOfNodes
         #END if len(childNodeBranchList)==0:
-
     else:
         #Not found the node - returning empty list
-        logging.debug(curr_tabStr+"Node not found. Returning empty list")
+        # logging.debug(curr_tabStr+"Node not found. Returning empty list")
         return []
     #END if not (parentNode.find(currNodeBranchTag) is None):
 #END def parseXMLKeyBranch(parentNode, childNodeBranchList):
@@ -45,28 +42,27 @@ def parseXMLKeyBranchWithList(parentNode, childNodeBranchList):
 
 
 def parseXMLToDataModel(dataModel):
-
     for field in dataModel["fields"]:
         print("Parsing field:{}".format(field))
 
 
 def createEntitiesFromFieldValuesDict(field_values_dict, data_model_class):
     keys_list = field_values_dict.keys()
-    logging.debug("keys_list:{}".format(keys_list))
-    logging.debug("last key:{}".format(keys_list[-1]))
-    logging.debug("NUmber of keys:{}".format(len(keys_list)))
+    # logging.debug("keys_list:{}".format(keys_list))
+    # logging.debug("last key:{}".format(keys_list[-1]))
+    # logging.debug("NUmber of keys:{}".format(len(keys_list)))
     fields_dict = dict((field, 0) for field in field_values_dict.keys())
-    logging.debug("fields_dict:{}".format(fields_dict))
-    logging.debug("field_values_dict:{}".format(field_values_dict))
+    # logging.debug("fields_dict:{}".format(fields_dict))
+    # logging.debug("field_values_dict:{}".format(field_values_dict))
 
     createdObjects = []
     
     # while fields_dict[keys_list[0]] < len(field_values_dict[keys_list[0]]):
-    logging.debug("fields_dict:{}".format(fields_dict))
+    # logging.debug("fields_dict:{}".format(fields_dict))
     curr_iterating_field = 0
     while fields_dict[keys_list[curr_iterating_field]] < len(field_values_dict[keys_list[curr_iterating_field]]):
-        logging.debug("fields_dict:{}".format(fields_dict))
-        logging.debug("curr_iterating_field:{}".format(curr_iterating_field))
+        # logging.debug("fields_dict:{}".format(fields_dict))
+        # logging.debug("curr_iterating_field:{}".format(curr_iterating_field))
 
         if curr_iterating_field < (len(keys_list)-1):
             if fields_dict[keys_list[curr_iterating_field]] >= len(field_values_dict[keys_list[curr_iterating_field]]): 
@@ -81,7 +77,7 @@ def createEntitiesFromFieldValuesDict(field_values_dict, data_model_class):
             continue
         else:
             i=0 #Iterate on last key
-            logging.debug("creating objects")
+            # logging.debug("creating objects")
             while i < len(field_values_dict[keys_list[-1]]):#Iterate over last key values
                 k=0
                 objectList = []
@@ -99,8 +95,8 @@ def createEntitiesFromFieldValuesDict(field_values_dict, data_model_class):
                         (keys_list[k], field_values_dict[keys_list[k]][fields_dict[keys_list[k]]])
                     )
                     k+=1
-                logging.debug("!!              OBJECT!!")
-                logging.debug(objectList)
+                # logging.debug("!!              OBJECT!!")
+                # logging.debug(objectList)
                 createdObjects.append(newObj)
 
                 i+=1
@@ -111,14 +107,10 @@ def createEntitiesFromFieldValuesDict(field_values_dict, data_model_class):
                     curr_iterating_field = 0
             fields_dict[keys_list[curr_iterating_field]] +=1 
 
-            logging.debug("CreatedObjects:{}".format(createdObjects))
+            # logging.debug("CreatedObjects:{}".format(createdObjects))
     return  createdObjects
 
 #END def createEntitiesFromFieldValuesDict(field_values_dict, data_model_class):
-
-
-
-                
 
 
 
@@ -145,7 +137,7 @@ def parserXMLNCTFile(fileName, dataModelsList):
     root = tree.getroot()
 
     for dataModel in dataModelsList:
-        logging.debug("parsing datamodel:{}".format(dataModel["name"]))
+        # logging.debug("parsing datamodel:{}".format(dataModel["name"]))
 
         field_values_dict = {}
 
@@ -155,8 +147,8 @@ def parserXMLNCTFile(fileName, dataModelsList):
         for key_tuple in (dataModel["fields"]):
             key = key_tuple[0]
             xml_path = key_tuple[1]
-            logging.debug( "Parsing for key:"+key)
-            logging.debug( "Key path:"+xml_path)
+            # logging.debug( "Parsing for key:"+key)
+            # logging.debug( "Key path:"+xml_path)
 
             field_values_dict[key] = []
 
@@ -183,35 +175,27 @@ def parserXMLNCTFile(fileName, dataModelsList):
                 logging.debug("")
                 logging.debug("")
 
-
-            logging.debug( "childNodeBranchList at the end:"+str(childNodeBranchList))
-
-            
+            # logging.debug( "childNodeBranchList at the end:"+str(childNodeBranchList))
             
             if len(keyBranchTextArray) > 0:#field found
                 keyBranchText = keyBranchTextArray[0]
-                logging.debug("keyBranchText:"+keyBranchText[:30])
+                # logging.debug("keyBranchText:"+keyBranchText[:30])
 
-                logging.debug("Number of branch texts found:{}".format(len(keyBranchTextArray)))
+                # logging.debug("Number of branch texts found:{}".format(len(keyBranchTextArray)))
 
                 for keyValue in keyBranchTextArray:
                     field_values_dict[key].append(keyValue)
-
-
-
 
                 # setattr(dataClass, key, keyBranchText)
                 # print("Key:{}".format(key))
                 # print("text:{}".format(keyBranchText))
 
             else:   #Field not found - putting NONE to datatable
-                logging.debug("keyBranchText IS NONE")
+                # logging.debug("keyBranchText IS NONE")
                 field_values_dict[key].append("**None**")
                 # setattr(dataClass, key, "**None**")
            
-            logging.debug("key values dict:{}".format(field_values_dict))
-            
-            
+            # logging.debug("key values dict:{}".format(field_values_dict))
 
         #END for key_tuple in dataModel["fields"]:
         entitiesList = createEntitiesFromFieldValuesDict(field_values_dict, dataModel["class"])
@@ -221,11 +205,4 @@ def parserXMLNCTFile(fileName, dataModelsList):
 
     return dataObjectsCreated
 
-
-
-
-
-
-    # for field in studies_field_list:
-        #         if field <> "id":
-        #                 setattr(new_study, field, "I am a field:"+field)
+#END def parserXMLNCTFile(fileName, dataModelsList):
