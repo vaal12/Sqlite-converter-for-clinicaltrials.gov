@@ -3,7 +3,12 @@ import logging
 
 # PATH_TO_XML_FILES = r"c:\\Dev\\06. Data\\1. XML from FDA\\03.1 test XML data from FDA\\"
 # XML_FILE_DIR = "c:\\Dev\\06. Data\\1. XML from FDA\\04. NCT FULL set 20Oct\\"
+
+
+#TEST DATA:
 # XML_FILE_DIR = "c:\\Dev\\06. Data\\1. XML from FDA\\03.1 test XML data from FDA\\" 
+
+#ACTUAL DATA
 XML_FILE_DIR = "c:\\Dev\\06. Data\\1. XML from FDA\\04. NCT FULL set 20Oct\\" 
 
 
@@ -25,7 +30,10 @@ def parseXMLFilesInDir(fileDirPath, totalFileNumberInDir, tables_writers_list, s
         for dirName, subdirList, fileList in os.walk(fileDirPath):
                 print('Found directory: %s' % dirName)
                 for fname in fileList:
-                #     print(colorama.ansi.clear_screen())
+                        if fname[-3:].lower() <> "xml":
+                                logging.debug("Non XML file. {}  SKIPPING".format(fname))
+                                continue
+                        # print(colorama.ansi.clear_screen())
                         fileCounter +=1
                         print("DIR:"+dirName)
                         print("  FILE:"+fname)
