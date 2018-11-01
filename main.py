@@ -41,7 +41,7 @@ def parseXMLFilesInDir(fileDirPath, totalFileNumberInDir, tables_writers_list, s
                                 continue
 
                         fileCounter +=1
-                        print("DIR:"+dirName)
+                        # print("DIR:"+dirName)
                         print("  FILE:"+fname)
                         # print('\t\t\t\t\t%s' % fname)
                         # logging.debug(dirName)
@@ -54,18 +54,22 @@ def parseXMLFilesInDir(fileDirPath, totalFileNumberInDir, tables_writers_list, s
 
                         #CHECK IN DB if this NCT was parsed
                         
-                        file_nct_name = fname[:-4]
+                        file_nct_name = fname[:12]
                         logging.debug("file name for NCT check :{}".format(file_nct_name))
-                        rows = db_engine.execute("SELECT COUNT(*) FROM studies WHERE nct_id = '{}'".format(file_nct_name)).fetchall()
+                        rows = db_engine.execute("SELECT COUNT(*) FROM studies WHERE nct_id = ?", file_nct_name).fetchall()
                         nct_id_count = rows[0][0]
                         logging.debug("Result:{}".format(nct_id_count))
 
-                        if nct_id_count > 0: continue
+                        if nct_id_count > 0: 
+                                logging.debug("SKIPPING")        
+                                continue
+
+                        logging.debug("parsing file")
                         
                         objs_created = parserXMLNCTFile(dirName+"\\\\"+fname,
                                                 tables_writers_list)
-                        print("Objs created:{}".format(objs_created))
-                        print("Number of objs created:{}".format(len(objs_created)))
+                        # print("Objs created:{}".format(objs_created))
+                        # print("Number of objs created:{}".format(len(objs_created)))
                         objects_created.extend(objs_created)
                         if len(objects_created) > 800:
                                 for obj in objects_created:
@@ -96,6 +100,9 @@ if __name__ == "__main__":
 
         # 3 - create a new session
         session = Session()
+
+        #create index for faster search for NCTs
+        engine.execute("CREATE INDEX IF NOT EXISTS `nct_id_studies_index` ON `studies` ( `nct_id` ASC )")
 
         parseXMLFilesInDir(XML_FILE_DIR, 1000, models_list, session, engine)
 
